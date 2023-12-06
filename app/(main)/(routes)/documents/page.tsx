@@ -4,26 +4,29 @@ import Image from "next/image";
 import { useUser } from "@clerk/clerk-react";
 import { PlusCircle } from "lucide-react";
 import { useMutation } from "convex/react";
-
-import { Button } from "@/components/ui/button";
-import { api } from "@/convex/_generated/api";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
 
 const DocumentsPage = () => {
+  const router = useRouter();
   const { user } = useUser();
-  const create = useMutation(api.documents.create); //accessing/calling the api
+  const create = useMutation(api.documents.create);
 
   const onCreate = () => {
-    //function to create a document on click
-    const promise = create({ title: "Untitled" });
+    const promise = create({ title: "Untitled" })
+      .then((documentId) => router.push(`/documents/${documentId}`))
 
     toast.promise(promise, {
       loading: "Creating a new note...",
-      success: "New note created successfully",
-      error: "An error occurred while creating a note",
+      success: "New note created!",
+      error: "Failed to create a new note."
     });
   };
-  return (
+
+  return ( 
     <div className="h-full flex flex-col items-center justify-center space-y-4">
       <Image
         src="/empty.png"
@@ -47,7 +50,7 @@ const DocumentsPage = () => {
         Create a note
       </Button>
     </div>
-  );
-};
-
+   );
+}
+ 
 export default DocumentsPage;

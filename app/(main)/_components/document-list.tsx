@@ -1,13 +1,15 @@
 "use client";
 
-import { api } from "@/convex/_generated/api";
-import { Doc, Id } from "@/convex/_generated/dataModel";
-import { useQuery } from "convex/react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import Item from "./item";
+import { useQuery } from "convex/react";
 import { FileIcon } from "lucide-react";
+
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
 import { cn } from "@/lib/utils";
+
+import { Item } from "./item";
 
 interface DocumentListProps {
   parentDocumentId?: Id<"documents">;
@@ -15,20 +17,23 @@ interface DocumentListProps {
   data?: Doc<"documents">[];
 }
 
-const DocumentList = ({ parentDocumentId, level = 0 }: DocumentListProps) => {
+export const DocumentList = ({
+  parentDocumentId,
+  level = 0
+}: DocumentListProps) => {
   const params = useParams();
   const router = useRouter();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const onExpand = (documentId: string) => {
-    setExpanded((prevExpanded) => ({
+    setExpanded(prevExpanded => ({
       ...prevExpanded,
-      [documentId]: !prevExpanded[documentId],
+      [documentId]: !prevExpanded[documentId]
     }));
   };
 
   const documents = useQuery(api.documents.getSidebar, {
-    parentDocument: parentDocumentId,
+    parentDocument: parentDocumentId
   });
 
   const onRedirect = (documentId: string) => {
@@ -47,12 +52,13 @@ const DocumentList = ({ parentDocumentId, level = 0 }: DocumentListProps) => {
         )}
       </>
     );
-  }
+  };
+
   return (
-    <div>
+    <>
       <p
         style={{
-          paddingLeft: level ? `${level * 12 + 25}px` : undefined,
+          paddingLeft: level ? `${(level * 12) + 25}px` : undefined
         }}
         className={cn(
           "hidden text-sm font-medium text-muted-foreground/80",
@@ -76,12 +82,13 @@ const DocumentList = ({ parentDocumentId, level = 0 }: DocumentListProps) => {
             expanded={expanded[document._id]}
           />
           {expanded[document._id] && (
-            <DocumentList parentDocumentId={document._id} level={level + 1} />
+            <DocumentList
+              parentDocumentId={document._id}
+              level={level + 1}
+            />
           )}
         </div>
       ))}
-    </div>
+    </>
   );
 };
-
-export default DocumentList;
